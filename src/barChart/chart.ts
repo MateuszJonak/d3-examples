@@ -26,6 +26,22 @@ export const createChart = ({ width, height, data, keys }: ChartProps) => {
     .range(d3.schemeSpectral[series.length])
     .unknown('#ccc');
 
+  const transitionStackedBars = (
+    rect: d3.Selection<
+      d3.BaseType | SVGRectElement,
+      d3.SeriesPoint<Item>,
+      d3.BaseType | SVGGElement,
+      d3.Series<Item, string>
+    >,
+  ) => {
+    rect
+      .transition()
+      .duration(400)
+      .delay((d, i) => i * 10)
+      .attr('y', (d) => y(d[1]))
+      .attr('height', (d) => y(d[0]) - y(d[1]));
+  };
+
   const appendBars = (
     g: d3.Selection<
       d3.BaseType | SVGGElement,
@@ -39,9 +55,10 @@ export const createChart = ({ width, height, data, keys }: ChartProps) => {
       .data((d) => d)
       .join('rect')
       .attr('x', (d) => x(d.data.name))
-      .attr('y', (d) => y(d[1]))
-      .attr('height', (d) => y(d[0]) - y(d[1]))
-      .attr('width', x.bandwidth());
+      .attr('y', () => height - margin.bottom)
+      .attr('height', 0)
+      .attr('width', x.bandwidth())
+      .call(transitionStackedBars);
 
   const appendSeries = (
     g: d3.Selection<SVGGElement, undefined, null, undefined>,
