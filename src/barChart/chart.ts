@@ -20,6 +20,41 @@ export const createChart = ({ width, height, data, keys }: ChartProps) => {
     .domain([0, yDomainMax])
     .rangeRound([height - margin.bottom, margin.top]);
 
+  const color = d3
+    .scaleOrdinal<string>()
+    .domain(series.map((d) => d.key))
+    .range(d3.schemeSpectral[series.length])
+    .unknown('#ccc');
+
+  const appendBars = (
+    g: d3.Selection<
+      d3.BaseType | SVGGElement,
+      d3.Series<Item, string>,
+      SVGGElement,
+      undefined
+    >,
+  ) =>
+    g
+      .selectAll('rect')
+      .data((d) => d)
+      .join('rect')
+      .attr('x', (d) => x(d.data.name))
+      .attr('y', (d) => y(d[1]))
+      .attr('height', (d) => y(d[0]) - y(d[1]))
+      .attr('width', x.bandwidth());
+
+  const appendSeries = (
+    g: d3.Selection<SVGGElement, undefined, null, undefined>,
+  ) => {
+    g.selectAll('g')
+      .data(series)
+      .join('g')
+      .attr('fill', (d) => color(d.key))
+      .call(appendBars);
+  };
+
+  svg.append('g').call(appendSeries);
+
   svg
     .append('g')
     .attr('transform', `translate(0,${height - margin.bottom})`)
