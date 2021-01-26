@@ -4,7 +4,8 @@ import { ChartProps, Item } from './types';
 
 const fontSize = 14;
 const colorBoxSize = 30;
-const colorBoxPadding = 8;
+const colorBoxRightPadding = 8;
+const colorBoxBottomPadding = 8;
 
 export const createChartLegend = ({
   width,
@@ -48,7 +49,7 @@ export const createChartLegend = ({
     g
       .append('text')
       .attr('alignment-baseline', 'center')
-      .attr('x', colorBoxSize + colorBoxPadding)
+      .attr('x', colorBoxSize + colorBoxRightPadding)
       .attr('y', (colorBoxSize - fontSize) / 2 + fontSize)
       .text((d) => translation[d.key]);
 
@@ -57,7 +58,10 @@ export const createChartLegend = ({
     .selectAll('g')
     .data(series)
     .join('g')
-    .attr('transform', (_, i) => `translate(0, ${i * colorBoxSize + i * 4})`)
+    .attr(
+      'transform',
+      (_, i) => `translate(0, ${i * colorBoxSize + i * colorBoxBottomPadding})`,
+    )
     .attr('font-size', fontSize)
     .attr('font-family', 'sans-serif')
     .call(appendLegendColor)
